@@ -1,0 +1,28 @@
+{
+    "name": "staudenmeir/dusk-updater",
+    "description": "Updater for Laravel Dusk ChromeDriver binaries",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jonas Staudenmeir",
+            "email": "mail@jonas-staudenmeir.de"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.4",
+        "ext-openssl": "*",
+        "ext-zip": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Staudenmeir\\DuskUpdater\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Staudenmeir\\DuskUpdater\\DuskServiceProvider"
+            ]
+        }
+    }
+}
