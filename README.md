@@ -1,6 +1,6 @@
 ## Introduction
 
-This command updates your Laravel Dusk ChromeDriver binaries to the latest release.  
+This Artisan command updates your Laravel Dusk ChromeDriver binaries to the latest release.  
 It supports all versions of Dusk.
 
 ## Installation
