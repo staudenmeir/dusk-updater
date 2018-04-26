@@ -16,3 +16,7 @@ Users of Laravel 5.4 have to register the new provider in `AppServiceProvider::r
 ## Usage
 
     php artisan dusk:update
+    
+You can also specify the desired version:
+
+     php artisan dusk:update 2.37
