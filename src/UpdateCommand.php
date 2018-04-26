@@ -37,7 +37,7 @@ class UpdateCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'dusk:update';
+    protected $signature = 'dusk:update {version?}';
 
     /**
      * The console command description.
@@ -60,7 +60,9 @@ class UpdateCommand extends Command
      */
     public function handle()
     {
-        $version = trim(file_get_contents(static::$versionUrl));
+        $version = $this->argument('version') ?
+            $this->argument('version') :
+            trim(file_get_contents(static::$versionUrl));
 
         foreach (static::$slugs as $os => $slug) {
             $archive = $this->download($version, $slug);
