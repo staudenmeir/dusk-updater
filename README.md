@@ -5,7 +5,7 @@ It supports all versions of Dusk.
 
 ## Installation
 
-    composer require --dev staudenmeir/dusk-updater:^1.0
+    composer require --dev staudenmeir/dusk-updater
 
 Users of Laravel 5.4 have to register the new provider in `AppServiceProvider::register()`:
 
