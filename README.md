@@ -1,3 +1,9 @@
+<p align="center">
+[![Latest Stable Version](https://poser.pugx.org/staudenmeir/dusk-updater/v/stable)](https://packagist.org/packages/staudenmeir/dusk-updater)
+[![Total Downloads](https://poser.pugx.org/staudenmeir/dusk-updater/downloads)](https://packagist.org/packages/staudenmeir/dusk-updater)
+[![License](https://poser.pugx.org/staudenmeir/dusk-updater/license)](https://packagist.org/packages/staudenmeir/dusk-updater)
+</p>
+
 ## Introduction
 
 This Artisan command updates your Laravel Dusk ChromeDriver binaries to the latest release.  
@@ -17,6 +23,6 @@ Users of Laravel 5.4 have to register the new provider in `AppServiceProvider::r
 
     php artisan dusk:update
     
-You can also specify the desired version:
+You can also specify the desired ChromeDriver version:
 
      php artisan dusk:update 2.37
