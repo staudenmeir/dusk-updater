@@ -3,6 +3,7 @@
 namespace Staudenmeir\DuskUpdater;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use ZipArchive;
 
 class UpdateCommand extends Command
@@ -20,6 +21,13 @@ class UpdateCommand extends Command
      * @var string
      */
     public static $downloadUrl = 'https://chromedriver.storage.googleapis.com/%s/chromedriver_%s.zip';
+
+    /**
+     * URL to the ChromeDriver notes.
+     *
+     * @var string
+     */
+    public static $notesUrl = 'https://chromedriver.storage.googleapis.com/%s/notes.txt';
 
     /**
      * Download slugs for the available operating systems.
@@ -60,9 +68,11 @@ class UpdateCommand extends Command
      */
     public function handle()
     {
-        $version = $this->argument('version') ?
-            $this->argument('version') :
-            trim(file_get_contents(static::$versionUrl));
+        $latest = trim(file_get_contents(static::$versionUrl));
+
+        $versions = $this->versions($latest);
+
+        $version = $this->version($versions, $latest);
 
         foreach (static::$slugs as $os => $slug) {
             $archive = $this->download($version, $slug);
@@ -72,7 +82,9 @@ class UpdateCommand extends Command
             $this->rename($binary, $os);
         }
 
-        $this->info('ChromeDriver binaries updated successfully.');
+        $message = "ChromeDriver binaries successfully updated to version %s (Chrome v%d-%d).";
+
+        $this->info(sprintf($message, $version, $versions[$version]['min'], $versions[$version]['max']));
     }
 
     /**
@@ -130,5 +142,49 @@ class UpdateCommand extends Command
         rename($this->directory.$binary, $this->directory.$newName);
 
         chmod($this->directory.$newName, 0755);
+    }
+
+    /**
+     * Get the desired ChromeDriver version.
+     *
+     * @param  Collection  $versions
+     * @param  string  $latest
+     * @return string
+     */
+    protected function version(Collection $versions, $latest)
+    {
+        $version = $this->argument('version');
+
+        if ($version && !ctype_digit($version)) {
+            return $version;
+        }
+
+        $version = $versions->where('min', '<=', $version)->keys()->first();
+
+        return $version ? $version : $latest;
+    }
+
+    /**
+     * Get the available ChromeDriver versions.
+     *
+     * @param  string  $latest
+     * @return Collection
+     */
+    protected function versions($latest)
+    {
+        $versions = collect();
+
+        $notes = file_get_contents(sprintf(static::$notesUrl, $latest));
+
+        preg_match_all('#ChromeDriver v(\S+).*?\nSupports Chrome v(\d+)-(\d+)#', $notes, $matches, PREG_SET_ORDER);
+
+        foreach($matches as $match) {
+            $versions[$match[1]] = [
+                'min' => (int) $match[2],
+                'max' => (int) $match[3]
+            ];
+        }
+
+        return $versions;
     }
 }

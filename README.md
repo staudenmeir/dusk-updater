@@ -4,7 +4,7 @@
 
 ## Introduction
 
-This Artisan command updates your Laravel Dusk ChromeDriver binaries to the latest release.  
+This Artisan command updates your Laravel Dusk ChromeDriver binaries to the latest or specified release.  
 It supports all versions of Dusk.
 
 ## Installation
@@ -21,6 +21,12 @@ Users of Laravel 5.4 have to register the new provider in `AppServiceProvider::r
 
     php artisan dusk:update
     
-You can also specify the desired ChromeDriver version:
+By default, you receive the latest ChromeDriver release.
+
+You can also specify the major Chrome/Chromium version you are using:
+
+     php artisan dusk:update 64
+
+Or you directly specify the desired ChromeDriver version:
 
      php artisan dusk:update 2.37
