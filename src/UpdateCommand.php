@@ -147,7 +147,7 @@ class UpdateCommand extends Command
     /**
      * Get the desired ChromeDriver version.
      *
-     * @param  Collection  $versions
+     * @param  \Illuminate\Support\Collection  $versions
      * @param  string  $latest
      * @return string
      */
@@ -155,20 +155,20 @@ class UpdateCommand extends Command
     {
         $version = $this->argument('version');
 
-        if ($version && !ctype_digit($version)) {
+        if ($version && ! ctype_digit($version)) {
             return $version;
         }
 
         $version = $versions->where('min', '<=', $version)->keys()->first();
 
-        return $version ? $version : $latest;
+        return $version ?: $latest;
     }
 
     /**
      * Get the available ChromeDriver versions.
      *
      * @param  string  $latest
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     protected function versions($latest)
     {

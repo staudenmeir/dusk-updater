@@ -5,7 +5,7 @@
 ## Introduction
 
 This Artisan command updates your Laravel Dusk ChromeDriver binaries to the latest or specified release.  
-It supports all versions of Dusk.
+Supports all versions of Dusk.
 
 ## Installation
 
@@ -13,9 +13,11 @@ It supports all versions of Dusk.
 
 Users of Laravel 5.4 have to register the new provider in `AppServiceProvider::register()`:
 
-    if ($this->app->environment('local', 'testing')) {
-        $this->app->register(\Staudenmeir\DuskUpdater\DuskServiceProvider::class);
-    }
+```php
+if ($this->app->environment('local', 'testing')) {
+    $this->app->register(\Staudenmeir\DuskUpdater\DuskServiceProvider::class);
+}
+```
 
 ## Usage
 
