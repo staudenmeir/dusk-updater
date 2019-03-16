@@ -21,9 +21,9 @@ if ($this->app->environment('local', 'testing')) {
 
 ## Usage
 
+Download the latest ChromeDriver release:
+
     php artisan dusk:update
-    
-By default, you receive the latest ChromeDriver release.
 
 You can also specify the major Chrome/Chromium version you are using:
 
