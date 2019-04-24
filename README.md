@@ -27,10 +27,10 @@ Download the latest ChromeDriver release:
 
 You can also specify the major Chrome/Chromium version you are using:
 
-     php artisan dusk:update 64
+     php artisan dusk:update 74
 
 Or you directly specify the desired ChromeDriver version:
 
-     php artisan dusk:update 2.37
+     php artisan dusk:update 74.0.3729.6
      
 If Dusk is still using the previous version after the update, there is probably an old ChromeDriver process running that you need to terminate first. 
