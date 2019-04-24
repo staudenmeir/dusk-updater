@@ -92,7 +92,7 @@ class UpdateCommand extends Command
         $version = $this->argument('version');
 
         if ($version) {
-            if (! ctype_digit($version)) {
+            if (!ctype_digit($version)) {
                 return $version;
             }
 
@@ -127,7 +127,7 @@ class UpdateCommand extends Command
     /**
      * Get the ChromeDriver version for a legacy version of Chrome.
      *
-     * @param  string  $version
+     * @param string $version
      * @return string
      */
     protected function legacyVersion($version)
@@ -142,8 +142,8 @@ class UpdateCommand extends Command
     /**
      * Download the ChromeDriver archive.
      *
-     * @param  string  $version
-     * @param  string  $slug
+     * @param string $version
+     * @param string $slug
      * @return string
      */
     protected function download($version, $slug)
@@ -160,7 +160,7 @@ class UpdateCommand extends Command
     /**
      * Extract the ChromeDriver binary from the archive and delete the archive.
      *
-     * @param  string  $archive
+     * @param string $archive
      * @return string
      */
     protected function extract($archive)
@@ -183,8 +183,8 @@ class UpdateCommand extends Command
     /**
      * Rename the ChromeDriver binary and make it executable.
      *
-     * @param  string  $binary
-     * @param  string  $os
+     * @param string $binary
+     * @param string $os
      * @return void
      */
     protected function rename($binary, $os)
