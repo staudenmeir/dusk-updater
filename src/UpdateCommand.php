@@ -8,11 +8,11 @@ use ZipArchive;
 class UpdateCommand extends Command
 {
     /**
-     * URL to the index page.
+     * URL to the home page.
      *
      * @var string
      */
-    public static $indexUrl = 'https://chromedriver.storage.googleapis.com';
+    public static $homeUrl = 'http://chromedriver.chromium.org/home';
 
     /**
      * URL to the latest release version.
@@ -91,18 +91,18 @@ class UpdateCommand extends Command
     {
         $version = $this->argument('version');
 
-        if ($version) {
-            if (!ctype_digit($version)) {
-                return $version;
-            }
+        if (!$version) {
+            return $this->latestVersion();
+        }
 
-            $version = (int) $version;
+        if (!ctype_digit($version)) {
+            return $version;
+        }
 
-            if ($version < 70) {
-                return $this->legacyVersion($version);
-            }
-        } else {
-            $version = $this->latestChromeVersion();
+        $version = (int) $version;
+
+        if ($version < 70) {
+            return $this->legacyVersion($version);
         }
 
         $url = sprintf(static::$versionUrl, $version);
@@ -111,23 +111,23 @@ class UpdateCommand extends Command
     }
 
     /**
-     * Get the latest major Chrome version.
+     * Get the latest stable ChromeDriver version.
      *
-     * @return int
+     * @return string
      */
-    protected function latestChromeVersion()
+    protected function latestVersion()
     {
-        $index = file_get_contents(static::$indexUrl);
+        $home = file_get_contents(static::$homeUrl);
 
-        preg_match('#.*<Key>LATEST_RELEASE_(\d+)</Key>#', $index, $matches);
+        preg_match('/Latest stable release:.*?\?path=([\d.]+)/', $home, $matches);
 
-        return (int) $matches[1];
+        return $matches[1];
     }
 
     /**
      * Get the ChromeDriver version for a legacy version of Chrome.
      *
-     * @param string $version
+     * @param int $version
      * @return string
      */
     protected function legacyVersion($version)

@@ -21,7 +21,7 @@ if ($this->app->environment('local', 'testing')) {
 
 ## Usage
 
-Download the latest ChromeDriver release:
+Download the latest stable ChromeDriver release:
 
     php artisan dusk:update
 
