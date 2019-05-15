@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/staudenmeir/dusk-updater.svg?branch=master)](https://travis-ci.org/staudenmeir/dusk-updater)
+[![Code Coverage](https://scrutinizer-ci.com/g/staudenmeir/dusk-updater/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/staudenmeir/dusk-updater/?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/staudenmeir/dusk-updater/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/staudenmeir/dusk-updater/?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/staudenmeir/dusk-updater/v/stable)](https://packagist.org/packages/staudenmeir/dusk-updater)
 [![Total Downloads](https://poser.pugx.org/staudenmeir/dusk-updater/downloads)](https://packagist.org/packages/staudenmeir/dusk-updater)
 [![License](https://poser.pugx.org/staudenmeir/dusk-updater/license)](https://packagist.org/packages/staudenmeir/dusk-updater)

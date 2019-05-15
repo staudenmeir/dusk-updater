@@ -61,6 +61,20 @@ class UpdateCommand extends Command
     protected $directory = __DIR__.'/../../../laravel/dusk/bin/';
 
     /**
+     * Create a new console command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        if (defined('DUSK_UPDATER_TEST')) {
+            $this->directory = __DIR__.'/../tests/bin/';
+        }
+
+        parent::__construct();
+    }
+
+    /**
      * Execute the console command.
      *
      * @return void

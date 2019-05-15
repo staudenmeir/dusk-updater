@@ -13,9 +13,17 @@
         "ext-openssl": "*",
         "ext-zip": "*"
     },
+    "require-dev": {
+        "orchestra/testbench": "^3.8"
+    },
     "autoload": {
         "psr-4": {
             "Staudenmeir\\DuskUpdater\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
         }
     },
     "extra": {
