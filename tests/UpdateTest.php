@@ -54,6 +54,55 @@ class UpdateTest extends TestCase
         $this->assertTrue(file_exists(__DIR__.'/bin/chromedriver-win.exe'));
     }
 
+    public function testChromeVersionDetection()
+    {
+        $version = $this->latestVersion();
+
+        $this->artisan('dusk:update', ['--detect' => null])
+            ->expectsOutput('Chrome version '.$this->chromeVersion().' detected.')
+            ->expectsOutput('ChromeDriver binary successfully updated to version '.$version.'.')
+            ->assertExitCode(0);
+
+        $this->assertStringContainsString($version, shell_exec(__DIR__.'/bin/chromedriver-linux --version'));
+        $this->assertTrue(is_executable(__DIR__.'/bin/chromedriver-linux'));
+        $this->assertFalse(file_exists(__DIR__.'/bin/chromedriver-mac'));
+        $this->assertFalse(file_exists(__DIR__.'/bin/chromedriver-win.exe'));
+    }
+
+    public function testChromeVersionDetectionWithPath()
+    {
+        $version = $this->latestVersion();
+
+        $this->artisan('dusk:update', ['--detect' => '/usr/bin/google-chrome'])
+            ->expectsOutput('Chrome version '.$this->chromeVersion().' detected.')
+            ->expectsOutput('ChromeDriver binary successfully updated to version '.$version.'.')
+            ->assertExitCode(0);
+
+        $this->assertStringContainsString($version, shell_exec(__DIR__.'/bin/chromedriver-linux --version'));
+        $this->assertTrue(is_executable(__DIR__.'/bin/chromedriver-linux'));
+        $this->assertFalse(file_exists(__DIR__.'/bin/chromedriver-mac'));
+        $this->assertFalse(file_exists(__DIR__.'/bin/chromedriver-win.exe'));
+    }
+
+    public function testChromeVersionDetectionWithInvalidPath()
+    {
+        $this->artisan('dusk:update', ['--detect' => '/dev/null'])
+            ->expectsOutput('Chrome version could not be detected. Please submit an issue: https://github.com/staudenmeir/dusk-updater')
+            ->assertExitCode(1);
+    }
+
+    /**
+     * Get the installed Chrome version.
+     *
+     * @return string
+     */
+    protected function chromeVersion()
+    {
+        preg_match('/[\d.]+/', `google-chrome --version`, $matches);
+
+        return $matches[0];
+    }
+
     /**
      * Get the latest stable ChromeDriver version.
      *

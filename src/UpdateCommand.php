@@ -3,10 +3,13 @@
 namespace Staudenmeir\DuskUpdater;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 use ZipArchive;
 
 class UpdateCommand extends Command
 {
+    use DetectsChromeVersion;
+
     /**
      * URL to the home page.
      *
@@ -44,7 +47,8 @@ class UpdateCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'dusk:update {version?}';
+    protected $signature = 'dusk:update {version?}
+        {--detect= : Detect the installed Chrome/Chromium version, optionally in a custom path}';
 
     /**
      * The console command description.
@@ -77,13 +81,25 @@ class UpdateCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
-        $version = $this->version();
+        $detect = $this->input->hasParameterOption('--detect');
+
+        $currentOs = $this->os();
+
+        $version = $this->version($detect, $currentOs);
+
+        if ($version === false) {
+            return 1;
+        }
 
         foreach (static::$slugs as $os => $slug) {
+            if ($detect && $os !== $currentOs) {
+                continue;
+            }
+
             $archive = $this->download($version, $slug);
 
             $binary = $this->extract($archive);
@@ -91,29 +107,41 @@ class UpdateCommand extends Command
             $this->rename($binary, $os);
         }
 
-        $message = "ChromeDriver binaries successfully updated to version %s.";
+        $this->info(
+            sprintf('ChromeDriver %s successfully updated to version %s.', $detect ? 'binary' : 'binaries', $version)
+        );
 
-        $this->info(sprintf($message, $version));
+        return 0;
     }
 
     /**
      * Get the desired ChromeDriver version.
      *
-     * @return string
+     * @param bool $detect
+     * @param string $os
+     * @return string|bool
      */
-    protected function version()
+    protected function version($detect, $os)
     {
-        $version = $this->argument('version');
+        if ($detect) {
+            $version = $this->chromeVersion($os);
 
-        if (!$version) {
-            return $this->latestVersion();
+            if ($version === false) {
+                return false;
+            }
+        } else {
+            $version = $this->argument('version');
+
+            if (!$version) {
+                return $this->latestVersion();
+            }
+
+            if (!ctype_digit($version)) {
+                return $version;
+            }
+
+            $version = (int) $version;
         }
-
-        if (!ctype_digit($version)) {
-            return $version;
-        }
-
-        $version = (int) $version;
 
         if ($version < 70) {
             return $this->legacyVersion($version);
@@ -208,5 +236,17 @@ class UpdateCommand extends Command
         rename($this->directory.$binary, $this->directory.$newName);
 
         chmod($this->directory.$newName, 0755);
+    }
+
+    /**
+     * Detect the current operating system.
+     *
+     * @return string
+     */
+    protected function os()
+    {
+        return PHP_OS === 'WINNT' || Str::contains(php_uname(), 'Microsoft')
+            ? 'win'
+            : (PHP_OS === 'Darwin' ? 'mac' : 'linux');
     }
 }

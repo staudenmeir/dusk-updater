@@ -7,7 +7,8 @@
 
 ## Introduction
 
-This Artisan command updates your Laravel Dusk ChromeDriver binaries to the latest or specified release.  
+This Artisan command updates your Laravel Dusk ChromeDriver binaries to the latest or specified release.
+
 Supports all versions of Dusk.
 
 ## Installation
@@ -28,11 +29,19 @@ Download the latest stable ChromeDriver release:
 
     php artisan dusk:update
 
-You can also specify the major Chrome/Chromium version you are using:
+Let the updater detect the installed Chrome/Chromium version:
+
+    php artisan dusk:update --detect
+
+Specify the absolute path to your custom Chrome/Chromium installation (not supported on Windows):
+
+    php artisan dusk:update --detect=/usr/bin/google-chrome
+
+Specify the major Chrome/Chromium version manually:
 
      php artisan dusk:update 74
 
-Or you directly specify the desired ChromeDriver version:
+Specify the desired ChromeDriver version manually:
 
      php artisan dusk:update 74.0.3729.6
      

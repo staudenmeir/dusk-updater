@@ -2,6 +2,9 @@ language: php
 
 php: 7.3
 
+addons:
+  chrome: stable
+
 cache:
   directories:
     - $HOME/.composer/cache
