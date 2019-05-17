@@ -4,6 +4,7 @@ namespace Staudenmeir\DuskUpdater;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Symfony\Component\Process\Process;
 use ZipArchive;
 
 class UpdateCommand extends Command
@@ -40,6 +41,17 @@ class UpdateCommand extends Command
         'linux' => 'linux64',
         'mac' => 'mac64',
         'win' => 'win32',
+    ];
+
+    /**
+     * The file extensions of the ChromeDriver binaries.
+     *
+     * @var array
+     */
+    public static $extensions = [
+        'linux' => '',
+        'mac' => '',
+        'win' => '.exe',
     ];
 
     /**
@@ -95,11 +107,17 @@ class UpdateCommand extends Command
             return 1;
         }
 
-        $this->update($detect, $os, $version);
+        if ($detect && $this->checkVersion($os, $version)) {
+            $this->info(
+                sprintf('No update necessary, your ChromeDriver binary is already on version %s.', $version)
+            );
+        } else {
+            $this->update($detect, $os, $version);
 
-        $this->info(
-            sprintf('ChromeDriver %s successfully updated to version %s.', $detect ? 'binary' : 'binaries', $version)
-        );
+            $this->info(
+                sprintf('ChromeDriver %s successfully updated to version %s.', $detect ? 'binary' : 'binaries', $version)
+            );
+        }
 
         return 0;
     }
@@ -169,6 +187,26 @@ class UpdateCommand extends Command
         $legacy = json_decode($legacy, true);
 
         return $legacy[$version];
+    }
+
+    /**
+     * Check whether the ChromeDriver binary needs to be updated.
+     *
+     * @param string $os
+     * @param string $version
+     * @return bool
+     */
+    protected function checkVersion($os, $version)
+    {
+        $binary = $this->directory.'chromedriver-'.$os.static::$extensions[$os];
+
+        $process = new Process([$binary, '--version']);
+
+        $process->run();
+
+        preg_match('/[\d.]+/', $process->getOutput(), $matches);
+
+        return isset($matches[0]) ? $matches[0] === $version : false;
     }
 
     /**

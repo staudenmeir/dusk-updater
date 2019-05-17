@@ -63,6 +63,11 @@ class UpdateTest extends TestCase
             ->expectsOutput('ChromeDriver binary successfully updated to version '.$version.'.')
             ->assertExitCode(0);
 
+        $this->artisan('dusk:update', ['--detect' => null])
+            ->expectsOutput('Chrome version '.$this->chromeVersion().' detected.')
+            ->expectsOutput('No update necessary, your ChromeDriver binary is already on version '.$version.'.')
+            ->assertExitCode(0);
+
         $this->assertStringContainsString($version, shell_exec(__DIR__.'/bin/chromedriver-linux --version'));
         $this->assertTrue(is_executable(__DIR__.'/bin/chromedriver-linux'));
         $this->assertFalse(file_exists(__DIR__.'/bin/chromedriver-mac'));
