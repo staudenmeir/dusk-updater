@@ -11,28 +11,28 @@ class UpdateCommand extends Command
     use DetectsChromeVersion;
 
     /**
-     * URL to the home page.
+     * The URL to the home page.
      *
      * @var string
      */
     public static $homeUrl = 'http://chromedriver.chromium.org/home';
 
     /**
-     * URL to the latest release version.
+     * The URL to the latest release version.
      *
      * @var string
      */
     public static $versionUrl = 'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%d';
 
     /**
-     * URL to the ChromeDriver download.
+     * The URL to the ChromeDriver download.
      *
      * @var string
      */
     public static $downloadUrl = 'https://chromedriver.storage.googleapis.com/%s/chromedriver_%s.zip';
 
     /**
-     * Download slugs for the available operating systems.
+     * The download slugs for the available operating systems.
      *
      * @var array
      */
@@ -58,7 +58,7 @@ class UpdateCommand extends Command
     protected $description = 'Update the Dusk ChromeDriver binaries';
 
     /**
-     * Path to the bin directory.
+     * The path to the binaries directory.
      *
      * @var string
      */
@@ -87,25 +87,15 @@ class UpdateCommand extends Command
     {
         $detect = $this->input->hasParameterOption('--detect');
 
-        $currentOs = $this->os();
+        $os = $this->os();
 
-        $version = $this->version($detect, $currentOs);
+        $version = $this->version($detect, $os);
 
         if ($version === false) {
             return 1;
         }
 
-        foreach (static::$slugs as $os => $slug) {
-            if ($detect && $os !== $currentOs) {
-                continue;
-            }
-
-            $archive = $this->download($version, $slug);
-
-            $binary = $this->extract($archive);
-
-            $this->rename($binary, $os);
-        }
+        $this->update($detect, $os, $version);
 
         $this->info(
             sprintf('ChromeDriver %s successfully updated to version %s.', $detect ? 'binary' : 'binaries', $version)
@@ -179,6 +169,29 @@ class UpdateCommand extends Command
         $legacy = json_decode($legacy, true);
 
         return $legacy[$version];
+    }
+
+    /**
+     * Update the ChromeDriver binaries.
+     *
+     * @param bool $detect
+     * @param string $currentOs
+     * @param string $version
+     * @return void
+     */
+    protected function update($detect, $currentOs, $version)
+    {
+        foreach (static::$slugs as $os => $slug) {
+            if ($detect && $os !== $currentOs) {
+                continue;
+            }
+
+            $archive = $this->download($version, $slug);
+
+            $binary = $this->extract($archive);
+
+            $this->rename($binary, $os);
+        }
     }
 
     /**
