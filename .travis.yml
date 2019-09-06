@@ -1,6 +1,8 @@
 language: php
 
-php: 7.3
+php:
+  - 7.3
+  - 7.4snapshot
 
 addons:
   chrome: stable
