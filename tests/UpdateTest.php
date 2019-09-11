@@ -117,7 +117,7 @@ class UpdateTest extends TestCase
     {
         $home = file_get_contents('http://chromedriver.chromium.org/home');
 
-        preg_match('/Latest stable release:.*?\?path=([\d.]+)/', $home, $matches);
+        preg_match('/Latest stable.*?\?path=([\d.]+)/', $home, $matches);
 
         return $matches[1];
     }

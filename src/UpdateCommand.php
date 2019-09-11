@@ -169,7 +169,7 @@ class UpdateCommand extends Command
     {
         $home = file_get_contents(static::$homeUrl);
 
-        preg_match('/Latest stable release:.*?\?path=([\d.]+)/', $home, $matches);
+        preg_match('/Latest stable.*?\?path=([\d.]+)/', $home, $matches);
 
         return $matches[1];
     }
