@@ -12,14 +12,14 @@ class UpdateCommand extends Command
     use DetectsChromeVersion;
 
     /**
-     * The URL to the home page.
+     * The URL to the latest stable release version.
      *
      * @var string
      */
-    public static $homeUrl = 'http://chromedriver.chromium.org/home';
+    public static $latestVersionUrl = 'https://chromedriver.storage.googleapis.com/LATEST_RELEASE';
 
     /**
-     * The URL to the latest release version.
+     * The URL to the latest release version of a major Chrome version.
      *
      * @var string
      */
@@ -167,11 +167,7 @@ class UpdateCommand extends Command
      */
     protected function latestVersion()
     {
-        $home = file_get_contents(static::$homeUrl);
-
-        preg_match('/Latest stable.*?\?path=([\d.]+)/', $home, $matches);
-
-        return $matches[1];
+        return trim(file_get_contents(static::$latestVersionUrl));
     }
 
     /**

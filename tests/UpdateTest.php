@@ -115,10 +115,6 @@ class UpdateTest extends TestCase
      */
     protected function latestVersion()
     {
-        $home = file_get_contents('http://chromedriver.chromium.org/home');
-
-        preg_match('/Latest stable.*?\?path=([\d.]+)/', $home, $matches);
-
-        return $matches[1];
+        return trim(file_get_contents('https://chromedriver.storage.googleapis.com/LATEST_RELEASE'));
     }
 }
