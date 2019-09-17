@@ -19,7 +19,7 @@ class UpdateCommand extends Command
     public static $latestVersionUrl = 'https://chromedriver.storage.googleapis.com/LATEST_RELEASE';
 
     /**
-     * The URL to the latest release version of a major Chrome version.
+     * The URL to the latest release version for a major Chrome version.
      *
      * @var string
      */

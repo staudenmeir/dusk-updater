@@ -45,4 +45,4 @@ Specify the desired ChromeDriver version manually:
 
      php artisan dusk:update 74.0.3729.6
      
-If Dusk is still using the previous version after the update, there is probably an old ChromeDriver process running that you need to terminate first. 
+If Dusk is still using the previous version after the update, there is probably an old ChromeDriver process running that you need to terminate first.
