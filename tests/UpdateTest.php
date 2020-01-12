@@ -6,7 +6,7 @@ class UpdateTest extends TestCase
 {
     public function testLatestVersion()
     {
-        $version = $this->latestVersion();
+        $version = $this->driverVersion();
 
         $this->artisan('dusk:update')
             ->expectsOutput('ChromeDriver binaries successfully updated to version '.$version.'.')
@@ -56,15 +56,17 @@ class UpdateTest extends TestCase
 
     public function testChromeVersionDetection()
     {
-        $version = $this->latestVersion();
+        $chromeVersion = $this->chromeVersion();
+
+        $version = $this->driverVersion(explode('.', $chromeVersion)[0]);
 
         $this->artisan('dusk:update', ['--detect' => null])
-            ->expectsOutput('Chrome version '.$this->chromeVersion().' detected.')
+            ->expectsOutput('Chrome version '.$chromeVersion.' detected.')
             ->expectsOutput('ChromeDriver binary successfully updated to version '.$version.'.')
             ->assertExitCode(0);
 
         $this->artisan('dusk:update', ['--detect' => null])
-            ->expectsOutput('Chrome version '.$this->chromeVersion().' detected.')
+            ->expectsOutput('Chrome version '.$chromeVersion.' detected.')
             ->expectsOutput('No update necessary, your ChromeDriver binary is already on version '.$version.'.')
             ->assertExitCode(0);
 
@@ -76,10 +78,12 @@ class UpdateTest extends TestCase
 
     public function testChromeVersionDetectionWithPath()
     {
-        $version = $this->latestVersion();
+        $chromeVersion = $this->chromeVersion();
+
+        $version = $this->driverVersion(explode('.', $chromeVersion)[0]);
 
         $this->artisan('dusk:update', ['--detect' => '/usr/bin/google-chrome'])
-            ->expectsOutput('Chrome version '.$this->chromeVersion().' detected.')
+            ->expectsOutput('Chrome version '.$chromeVersion.' detected.')
             ->expectsOutput('ChromeDriver binary successfully updated to version '.$version.'.')
             ->assertExitCode(0);
 
@@ -109,12 +113,19 @@ class UpdateTest extends TestCase
     }
 
     /**
-     * Get the latest stable ChromeDriver version.
+     * Get the latest stable or a specific ChromeDriver version.
      *
+     * @param int|null $major
      * @return string
      */
-    protected function latestVersion()
+    protected function driverVersion(int $major = null)
     {
-        return trim(file_get_contents('https://chromedriver.storage.googleapis.com/LATEST_RELEASE'));
+        $url = 'https://chromedriver.storage.googleapis.com/LATEST_RELEASE';
+
+        if ($major) {
+            $url .= '_'.$major;
+        }
+
+        return trim(file_get_contents($url));
     }
 }
