@@ -15,6 +15,7 @@ trait DetectsChromeVersion
         'linux' => [
             '/usr/bin/google-chrome --version',
             '/usr/bin/chromium-browser --version',
+            '/usr/bin/google-chrome-stable --version',
         ],
         'mac' => [
             '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version',
