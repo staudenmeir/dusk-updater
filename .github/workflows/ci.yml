@@ -5,14 +5,14 @@ on: [push, pull_request]
 jobs:
   tests:
     runs-on: ubuntu-latest
-      
+
     strategy:
       matrix:
-        php: [8.0, 7.4, 7.3, 7.2]
+        php: [8.1, 8.0, 7.4, 7.3]
         release: [stable, lowest]
-        include: 
+        include:
           - php: 7.4
-            release: stable 
+            release: stable
             coverage: xdebug
 
     steps:
