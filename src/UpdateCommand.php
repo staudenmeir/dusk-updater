@@ -12,38 +12,6 @@ class UpdateCommand extends Command
     use DetectsChromeVersion;
 
     /**
-     * The URL to the latest stable release version.
-     *
-     * @var string
-     */
-    public static $latestVersionUrl = 'https://chromedriver.storage.googleapis.com/LATEST_RELEASE';
-
-    /**
-     * The URL to the latest release version for a major Chrome version.
-     *
-     * @var string
-     */
-    public static $versionUrl = 'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%d';
-
-    /**
-     * The URL to the ChromeDriver download.
-     *
-     * @var string
-     */
-    public static $downloadUrl = 'https://chromedriver.storage.googleapis.com/%s/chromedriver_%s.zip';
-
-    /**
-     * The download slugs for the available operating systems.
-     *
-     * @var array
-     */
-    public static $slugs = [
-        'linux' => 'linux64',
-        'mac' => 'mac64',
-        'win' => 'win32',
-    ];
-
-    /**
      * The file extensions of the ChromeDriver binaries.
      *
      * @var array
@@ -104,6 +72,8 @@ class UpdateCommand extends Command
         $version = $this->version($detect, $os);
 
         if ($version === false) {
+            $this->error('Could not determine the ChromeDriver version.');
+
             return 1;
         }
 
@@ -153,21 +123,82 @@ class UpdateCommand extends Command
 
         if ($version < 70) {
             return $this->legacyVersion($version);
+        } elseif ($version < 115) {
+            return $this->fetchChromeVersionFromUrl($version);
         }
 
-        $url = sprintf(static::$versionUrl, $version);
+        $milestones = $this->resolveChromeVersionsPerMilestone();
 
-        return trim(file_get_contents($url));
+        return $milestones['milestones'][$version]['version'] ?? false;
     }
 
     /**
      * Get the latest stable ChromeDriver version.
      *
-     * @return string
+     * @return string|false
      */
     protected function latestVersion()
     {
-        return trim(file_get_contents(static::$latestVersionUrl));
+        $versions = json_decode(
+            file_get_contents(
+                'https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json'
+            ),
+            true
+        );
+
+        return $versions['channels']['Stable']['version'] ?? false;
+    }
+
+    /**
+     * Get the Chrome version from URL.
+     *
+     * @param int $version
+     * @return string
+     */
+    protected function fetchChromeVersionFromUrl($version)
+    {
+        return trim((string) file_get_contents(
+            sprintf('https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%d', $version)
+        ));
+    }
+
+    /**
+     * Get the Chrome versions per milestone.
+     *
+     * @return array
+     */
+    protected function resolveChromeVersionsPerMilestone()
+    {
+        return json_decode(
+            file_get_contents(
+                'https://googlechromelabs.github.io/chrome-for-testing/latest-versions-per-milestone-with-downloads.json'
+            ),
+            true
+        );
+    }
+
+    /**
+     * Resolve the download URL.
+     *
+     * @param string $version
+     * @param string $os
+     * @return string
+     */
+    protected function resolveChromeDriverDownloadUrl($version, $os)
+    {
+        $slug = static::chromeDriverSlug($os, $version);
+
+        if (version_compare($version, '115.0', '<')) {
+            return sprintf('https://chromedriver.storage.googleapis.com/%s/chromedriver_%s.zip', $version, $slug);
+        }
+
+        $milestone = (int) $version;
+
+        $versions = $this->resolveChromeVersionsPerMilestone();
+
+        $chromedrivers = $versions['milestones'][$milestone]['downloads']['chromedriver'];
+
+        return collect($chromedrivers)->firstWhere('platform', $slug)['url'];
     }
 
     /**
@@ -215,14 +246,14 @@ class UpdateCommand extends Command
      */
     protected function update($detect, $currentOs, $version)
     {
-        foreach (static::$slugs as $os => $slug) {
+        foreach (static::all() as $os) {
             if ($detect && $os !== $currentOs) {
                 continue;
             }
 
-            $archive = $this->download($version, $slug);
+            $archive = $this->download($version, $os);
 
-            $binary = $this->extract($archive);
+            $binary = $this->extract($version, $archive);
 
             $this->rename($binary, $os);
         }
@@ -232,16 +263,22 @@ class UpdateCommand extends Command
      * Download the ChromeDriver archive.
      *
      * @param string $version
-     * @param string $slug
+     * @param string $os
      * @return string
      */
-    protected function download($version, $slug)
+    protected function download($version, $os)
     {
         $archive = $this->directory.'chromedriver.zip';
 
-        $url = sprintf(static::$downloadUrl, $version, $slug);
+        $url = $this->resolveChromeDriverDownloadUrl($version, $os);
 
-        file_put_contents($archive, fopen($url, 'r'));
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2);
+        curl_setopt($ch, CURLOPT_HTTPGET, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        file_put_contents($archive, curl_exec($ch));
+        curl_close($ch);
 
         return $archive;
     }
@@ -249,10 +286,11 @@ class UpdateCommand extends Command
     /**
      * Extract the ChromeDriver binary from the archive and delete the archive.
      *
+     * @param string $version
      * @param string $archive
      * @return string
      */
-    protected function extract($archive)
+    protected function extract($version, $archive)
     {
         $zip = new ZipArchive;
 
@@ -260,7 +298,7 @@ class UpdateCommand extends Command
 
         $zip->extractTo($this->directory);
 
-        $binary = $zip->getNameIndex(0);
+        $binary = $zip->getNameIndex(version_compare($version, '115.0', '<') ? 0 : 1);
 
         $zip->close();
 
@@ -278,7 +316,11 @@ class UpdateCommand extends Command
      */
     protected function rename($binary, $os)
     {
-        $newName = str_replace('chromedriver', 'chromedriver-'.$os, $binary);
+        $binary = str_replace(DIRECTORY_SEPARATOR, '/', $binary);
+
+        $newName = Str::contains($binary, '/')
+            ? Str::after(str_replace('chromedriver', 'chromedriver-'.$os, $binary), '/')
+            : str_replace('chromedriver', 'chromedriver-'.$os, $binary);
 
         rename($this->directory.$binary, $this->directory.$newName);
 
