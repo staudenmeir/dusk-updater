@@ -251,6 +251,10 @@ class UpdateCommand extends Command
                 continue;
             }
 
+            if (version_compare($version, '115.0', '<') && $os === 'mac-arm') {
+                continue;
+            }
+
             $archive = $this->download($version, $os);
 
             $binary = $this->extract($version, $archive);
@@ -325,17 +329,5 @@ class UpdateCommand extends Command
         rename($this->directory.$binary, $this->directory.$newName);
 
         chmod($this->directory.$newName, 0755);
-    }
-
-    /**
-     * Detect the current operating system.
-     *
-     * @return string
-     */
-    protected function os()
-    {
-        return PHP_OS === 'WINNT' || Str::contains(php_uname(), 'Microsoft')
-            ? 'win'
-            : (PHP_OS === 'Darwin' ? 'mac' : 'linux');
     }
 }
