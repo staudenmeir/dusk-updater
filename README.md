@@ -1,11 +1,11 @@
-![CI](https://github.com/staudenmeir/dusk-updater/workflows/CI/badge.svg)
+# Dusk Updater
+
+[![CI](https://github.com/staudenmeir/dusk-updater/actions/workflows/ci.yml/badge.svg)](https://github.com/staudenmeir/dusk-updater/actions/workflows/ci.yml)
 [![Code Coverage](https://scrutinizer-ci.com/g/staudenmeir/dusk-updater/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/staudenmeir/dusk-updater/?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/staudenmeir/dusk-updater/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/staudenmeir/dusk-updater/?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/staudenmeir/dusk-updater/v/stable)](https://packagist.org/packages/staudenmeir/dusk-updater)
-[![Total Downloads](https://poser.pugx.org/staudenmeir/dusk-updater/downloads)](https://packagist.org/packages/staudenmeir/dusk-updater)
-[![License](https://poser.pugx.org/staudenmeir/dusk-updater/license)](https://packagist.org/packages/staudenmeir/dusk-updater)
-
-## Introduction
+[![Total Downloads](https://poser.pugx.org/staudenmeir/dusk-updater/downloads)](https://packagist.org/packages/staudenmeir/dusk-updater/stats)
+[![License](https://poser.pugx.org/staudenmeir/dusk-updater/license)](https://github.com/staudenmeir/dusk-updater/blob/master/LICENSE)
 
 This Artisan command updates your Laravel Dusk ChromeDriver binaries to the latest or specified release.
 

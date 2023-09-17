@@ -139,7 +139,7 @@ class UpdateTest extends TestCase
         }
 
         if ($major < 115) {
-            $url = 'https://chromedriver.storage.googleapis.com/LATEST_RELEASE'.'_'.$major;
+            $url = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$major";
 
             return trim((string) file_get_contents($url));
         }

@@ -19,6 +19,8 @@ class UpdateCommand extends Command
     public static $extensions = [
         'linux' => '',
         'mac' => '',
+        'mac-intel' => '',
+        'mac-arm' => '',
         'win' => '.exe',
     ];
 

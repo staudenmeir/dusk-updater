@@ -1,6 +1,6 @@
 name: CI
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
   tests:
@@ -8,16 +8,16 @@ jobs:
 
     strategy:
       matrix:
-        php: [8.1, 8.0, 7.4, 7.3]
-        release: [stable, lowest]
+        php: [ 8.1, 8.0, 7.4, 7.3 ]
+        release: [ stable, lowest ]
         include:
           - php: 7.4
             release: stable
             coverage: xdebug
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
         with:
           path: ~/.composer/cache/files
           key: php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.json') }}
