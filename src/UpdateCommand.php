@@ -298,7 +298,7 @@ class UpdateCommand extends Command
      */
     protected function extract($version, $archive)
     {
-        $zip = new ZipArchive;
+        $zip = new ZipArchive();
 
         $zip->open($archive);
 

@@ -125,7 +125,7 @@ class UpdateTest extends TestCase
      * @param int|null $major
      * @return string
      */
-    protected function driverVersion($major = null)
+    protected function driverVersion(int $major = null)
     {
         if (is_null($major)) {
             $versions = json_decode(
