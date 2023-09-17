@@ -2,6 +2,7 @@
 
 namespace Staudenmeir\DuskUpdater;
 
+use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 
 trait DetectsChromeVersion
@@ -11,17 +12,42 @@ trait DetectsChromeVersion
      *
      * @var array
      */
-    protected $chromeCommands = [
+    protected static $platforms = [
         'linux' => [
-            '/usr/bin/google-chrome --version',
-            '/usr/bin/chromium-browser --version',
-            '/usr/bin/google-chrome-stable --version',
+            'slug' => 'linux64',
+            'commands' => [
+                '/usr/bin/google-chrome --version',
+                '/usr/bin/chromium-browser --version',
+                '/usr/bin/chromium --version',
+                '/usr/bin/google-chrome-stable --version',
+            ],
         ],
         'mac' => [
-            '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version',
+            'slug' => 'mac-x64',
+            'commands' => [
+                '/Applications/Google\ Chrome\ for\ Testing.app/Contents/MacOS/Google\ Chrome\ for\ Testing --version',
+                '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version',
+            ],
+        ],
+        'mac-intel' => [
+            'slug' => 'mac-x64',
+            'commands' => [
+                '/Applications/Google\ Chrome\ for\ Testing.app/Contents/MacOS/Google\ Chrome\ for\ Testing --version',
+                '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version',
+            ],
+        ],
+        'mac-arm' => [
+            'slug' => 'mac-arm64',
+            'commands' => [
+                '/Applications/Google\ Chrome\ for\ Testing.app/Contents/MacOS/Google\ Chrome\ for\ Testing --version',
+                '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version',
+            ],
         ],
         'win' => [
-            'reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version',
+            'slug' => 'win32',
+            'commands' => [
+                'reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version',
+            ],
         ],
     ];
 
@@ -44,7 +70,7 @@ trait DetectsChromeVersion
 
             $commands = [$path.' --version'];
         } else {
-            $commands = $this->chromeCommands[$os];
+            $commands = static::$platforms[$os]['commands'];
         }
 
         foreach ($commands as $command) {
@@ -68,5 +94,90 @@ trait DetectsChromeVersion
         $this->error('Chrome version could not be detected. Please submit an issue: https://github.com/staudenmeir/dusk-updater');
 
         return false;
+    }
+
+    /**
+     * Resolve the ChromeDriver slug for the given operating system.
+     *
+     * @param string $operatingSystem
+     * @param string|null $version
+     * @return string
+     */
+    public static function chromeDriverSlug($operatingSystem, $version = null)
+    {
+        $slug = static::$platforms[$operatingSystem]['slug'] ?? null;
+
+        if (!is_null($version) && version_compare($version, '115.0', '<')) {
+            if ($slug === 'mac-arm64') {
+                return version_compare($version, '106.0.5249', '<') ? 'mac64_m1' : 'mac_arm64';
+            } elseif ($slug === 'mac-x64') {
+                return 'mac64';
+            }
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Get all supported operating systems.
+     *
+     * @return array
+     */
+    public static function all()
+    {
+        return array_keys(static::$platforms);
+    }
+
+    /**
+     * Get the current operating system identifier.
+     *
+     * @return string
+     */
+    public static function os()
+    {
+        if (static::onWindows()) {
+            return 'win';
+        } elseif (static::onMac()) {
+            return static::macArchitectureId();
+        }
+
+        return 'linux';
+    }
+
+    /**
+     * Determine if the operating system is Windows or Windows Subsystem for Linux.
+     *
+     * @return bool
+     */
+    public static function onWindows()
+    {
+        return PHP_OS === 'WINNT' || Str::contains(php_uname(), 'Microsoft');
+    }
+
+    /**
+     * Determine if the operating system is macOS.
+     *
+     * @return bool
+     */
+    public static function onMac()
+    {
+        return PHP_OS === 'Darwin';
+    }
+
+    /**
+     * Get the current macOS platform architecture.
+     *
+     * @return string
+     */
+    public static function macArchitectureId()
+    {
+        switch (php_uname('m')) {
+            case 'arm64':
+                return 'mac-arm';
+            case 'x86_64':
+                return 'mac-intel';
+            default:
+                return 'mac';
+        }
     }
 }

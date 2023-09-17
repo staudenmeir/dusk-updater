@@ -54,6 +54,13 @@ class UpdateTest extends TestCase
         $this->assertTrue(file_exists(__DIR__.'/bin/chromedriver-win.exe'));
     }
 
+    public function testInvalidChromeVersion()
+    {
+        $this->artisan('dusk:update', ['version' => '999999'])
+            ->expectsOutput('Could not determine the ChromeDriver version.')
+            ->assertExitCode(1);
+    }
+
     public function testChromeVersionDetection()
     {
         $chromeVersion = $this->chromeVersion();
@@ -118,14 +125,32 @@ class UpdateTest extends TestCase
      * @param int|null $major
      * @return string
      */
-    protected function driverVersion(int $major = null)
+    protected function driverVersion($major = null)
     {
-        $url = 'https://chromedriver.storage.googleapis.com/LATEST_RELEASE';
+        if (is_null($major)) {
+            $versions = json_decode(
+                file_get_contents(
+                    'https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json'
+                ),
+                true
+            );
 
-        if ($major) {
-            $url .= '_'.$major;
+            return $versions['channels']['Stable']['version'];
         }
 
-        return trim(file_get_contents($url));
+        if ($major < 115) {
+            $url = 'https://chromedriver.storage.googleapis.com/LATEST_RELEASE'.'_'.$major;
+
+            return trim((string) file_get_contents($url));
+        }
+
+        $milestones = json_decode(
+            file_get_contents(
+                'https://googlechromelabs.github.io/chrome-for-testing/latest-versions-per-milestone-with-downloads.json'
+            ),
+            true
+        );
+
+        return $milestones['milestones'][$major]['version'];
     }
 }
