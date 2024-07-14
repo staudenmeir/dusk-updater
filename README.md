@@ -3,7 +3,7 @@
 [![CI](https://github.com/staudenmeir/dusk-updater/actions/workflows/ci.yml/badge.svg)](https://github.com/staudenmeir/dusk-updater/actions/workflows/ci.yml)
 [![Latest Stable Version](https://poser.pugx.org/staudenmeir/dusk-updater/v/stable)](https://packagist.org/packages/staudenmeir/dusk-updater)
 [![Total Downloads](https://poser.pugx.org/staudenmeir/dusk-updater/downloads)](https://packagist.org/packages/staudenmeir/dusk-updater/stats)
-[![License](https://poser.pugx.org/staudenmeir/dusk-updater/license)](https://github.com/staudenmeir/dusk-updater/blob/master/LICENSE)
+[![License](https://poser.pugx.org/staudenmeir/dusk-updater/license)](https://github.com/staudenmeir/dusk-updater/blob/maim/LICENSE)
 
 This Artisan command updates your Laravel Dusk ChromeDriver binaries to the latest or specified release.
 
