@@ -20,6 +20,6 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: bcmath, ctype, json, mbstring, openssl tokenizer, xml, zip
       - name: Install dependencies
-        run: composer update --no-interaction --no-progress --no-suggest --prefer-dist --prefer-${{ matrix.release }}
+        run: composer update --no-interaction --no-progress --prefer-dist --prefer-${{ matrix.release }}
       - name: Run tests
         run: vendor/bin/phpunit
