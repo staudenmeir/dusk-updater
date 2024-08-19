@@ -304,7 +304,15 @@ class UpdateCommand extends Command
 
         $zip->extractTo($this->directory);
 
-        $binary = $zip->getNameIndex(version_compare($version, '115.0', '<') ? 0 : 1);
+        if (version_compare($version, '115.0', '<')) {
+            $index = 0;
+        } elseif (version_compare($version, '127.0', '<')) {
+            $index = 1;
+        } else {
+            $index = 2;
+        }
+
+        $binary = $zip->getNameIndex($index);
 
         $zip->close();
 
