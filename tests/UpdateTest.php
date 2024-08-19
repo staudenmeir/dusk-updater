@@ -67,6 +67,10 @@ class UpdateTest extends TestCase
 
         $version = $this->driverVersion(explode('.', $chromeVersion)[0]);
 
+        $previousVersion = explode('.', $version)[0] - 1;
+
+        $this->artisan('dusk:update', ['version' => $previousVersion]);
+
         $this->artisan('dusk:update', ['--detect' => null])
             ->expectsOutput('Chrome version '.$chromeVersion.' detected.')
             ->expectsOutput('ChromeDriver binary successfully updated to version '.$version.'.')
@@ -79,8 +83,6 @@ class UpdateTest extends TestCase
 
         $this->assertStringContainsString($version, shell_exec(__DIR__.'/bin/chromedriver-linux --version'));
         $this->assertTrue(is_executable(__DIR__.'/bin/chromedriver-linux'));
-        $this->assertFalse(file_exists(__DIR__.'/bin/chromedriver-mac'));
-        $this->assertFalse(file_exists(__DIR__.'/bin/chromedriver-win.exe'));
     }
 
     public function testChromeVersionDetectionWithPath()
@@ -89,6 +91,10 @@ class UpdateTest extends TestCase
 
         $version = $this->driverVersion(explode('.', $chromeVersion)[0]);
 
+        $previousVersion = explode('.', $version)[0] - 1;
+
+        $this->artisan('dusk:update', ['version' => $previousVersion]);
+
         $this->artisan('dusk:update', ['--detect' => '/usr/bin/google-chrome'])
             ->expectsOutput('Chrome version '.$chromeVersion.' detected.')
             ->expectsOutput('ChromeDriver binary successfully updated to version '.$version.'.')
@@ -96,8 +102,6 @@ class UpdateTest extends TestCase
 
         $this->assertStringContainsString($version, shell_exec(__DIR__.'/bin/chromedriver-linux --version'));
         $this->assertTrue(is_executable(__DIR__.'/bin/chromedriver-linux'));
-        $this->assertFalse(file_exists(__DIR__.'/bin/chromedriver-mac'));
-        $this->assertFalse(file_exists(__DIR__.'/bin/chromedriver-win.exe'));
     }
 
     public function testChromeVersionDetectionWithInvalidPath()
