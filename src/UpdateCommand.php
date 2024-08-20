@@ -259,7 +259,7 @@ class UpdateCommand extends Command
 
             $archive = $this->download($version, $os);
 
-            $binary = $this->extract($version, $archive);
+            $binary = $this->extract($archive);
 
             $this->rename($binary, $os);
         }
@@ -292,27 +292,28 @@ class UpdateCommand extends Command
     /**
      * Extract the ChromeDriver binary from the archive and delete the archive.
      *
-     * @param string $version
      * @param string $archive
      * @return string
      */
-    protected function extract($version, $archive)
+    protected function extract($archive)
     {
         $zip = new ZipArchive();
 
         $zip->open($archive);
 
-        $zip->extractTo($this->directory);
+        $binary = null;
 
-        if (version_compare($version, '115.0', '<')) {
-            $index = 0;
-        } elseif (version_compare($version, '127.0', '<')) {
-            $index = 1;
-        } else {
-            $index = 2;
+        for ($fileIndex = 0; $fileIndex < $zip->numFiles; $fileIndex++) {
+            $filename = $zip->getNameIndex($fileIndex);
+
+            if (Str::startsWith(basename($filename), 'chromedriver')) {
+                $binary = $filename;
+
+                $zip->extractTo($this->directory, $binary);
+
+                break;
+            }
         }
-
-        $binary = $zip->getNameIndex($index);
 
         $zip->close();
 
