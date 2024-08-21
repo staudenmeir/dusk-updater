@@ -37,12 +37,12 @@ Specify the absolute path to your custom Chrome/Chromium installation (not suppo
 
 Specify the major Chrome/Chromium version manually:
 
-     php artisan dusk:update 74
+    php artisan dusk:update 127
 
 Specify the desired ChromeDriver version manually:
 
-     php artisan dusk:update 74.0.3729.6
-     
+    php artisan dusk:update 127.0.6533.119
+
 If Dusk is still using the previous version after the update, there is probably an old ChromeDriver process running that you need to terminate first.
 
 ## Contributing
